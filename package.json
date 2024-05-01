@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A simple local visual testing for Cypress users",
   "types": "src/support/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
@@ -15,6 +19,9 @@
   ],
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@actions/core": "^1.10.1",
     "console.table": "^0.10.0",

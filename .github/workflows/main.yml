@@ -1,0 +1,25 @@
+name: main
+on: push
+jobs:
+  test-and-release:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v4
+
+      - name: Run Cypress tests 🧪
+        # https://github.com/cypress-io/github-action
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
+
+      - name: Semantic Release 🚀
+        if: github.ref == 'refs/heads/main'
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          branch: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # TODO: commit any changed files back to the repository
