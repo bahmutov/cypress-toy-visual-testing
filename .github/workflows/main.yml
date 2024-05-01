@@ -21,6 +21,16 @@ jobs:
         with:
           build: npm run build
 
+      # after the test run completes store the screenshots and diffs
+      - name: Save screenshots 📸
+        uses: actions/upload-artifact@v4
+        # always upload the screenshots, even if the tests fail
+        if: always()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
       - name: Semantic Release 🚀
         if: github.ref == 'refs/heads/main'
         uses: cycjimmy/semantic-release-action@v4
