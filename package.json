@@ -2,8 +2,9 @@
   "name": "@bahmutov/cypress-toy-visual-testing",
   "version": "1.0.0",
   "description": "A simple local visual testing for Cypress users",
-  "main": "index.js",
+  "types": "src/support/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "test": "cypress run"
   },
   "keywords": [
@@ -13,8 +14,13 @@
   ],
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.26.2",
+    "odiff-bin": "^2.6.1"
+  },
   "devDependencies": {
     "cypress": "^13.8.1",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
   }
 }
