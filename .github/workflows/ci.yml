@@ -17,6 +17,11 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
+      - name: Set up Node.js 🚀
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Set pending visual status 🎨
         # https://github.com/myrotvorets/set-commit-status-action
         uses: myrotvorets/set-commit-status-action@v2.0.1

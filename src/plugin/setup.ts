@@ -123,10 +123,19 @@ export function setupVisualTesting(on, config) {
     console.log('image server listening on port 9555')
   })
 
+  // keep track of images even in sync or async modes
+  let newImages = 0
+  let matchingImages = 0
+  let differentImages = 0
+
   const imagesToDiff = []
   on('before:run', () => {
     imagesToDiff.length = 0
+    newImages = 0
+    matchingImages = 0
+    differentImages = 0
   })
+
   on('after:run', async () => {
     if (imagesToDiff.length) {
       console.log('Need to diff %d images', imagesToDiff.length)
@@ -141,10 +150,6 @@ export function setupVisualTesting(on, config) {
       } else {
         console.log(title)
       }
-
-      let newImages = 0
-      let matchingImages = 0
-      let differentImages = 0
 
       for (const specName of specNames) {
         console.log('diffing images for spec %s', specName)
@@ -180,25 +185,26 @@ export function setupVisualTesting(on, config) {
           console.table(['Status', 'Name', 'Diff %'], rows)
         }
       }
+    }
 
-      // end of all diffing
-      const countsText = `Visual testing: ${newImages} 🖼️ ${matchingImages} ✅ ${differentImages} ❌`
-      if (process.env.GITHUB_ACTIONS) {
-        ghCore.summary.addRaw(countsText, true).write()
-        // set the job outputs
-        ghCore.setOutput('new_images', newImages)
-        ghCore.setOutput('matching_images', matchingImages)
-        ghCore.setOutput('different_images', differentImages)
-        const countsWords = `${newImages} new images ${matchingImages} matching ${differentImages} different`
-        ghCore.setOutput('visual_description', countsWords)
-        // match the github action status
-        ghCore.setOutput(
-          'visual_status',
-          differentImages > 0 ? 'failure' : 'success',
-        )
-      } else {
-        console.log(countsText)
-      }
+    // print the final stats
+    // end of all diffing
+    const countsText = `Visual testing: ${newImages} 🖼️ ${matchingImages} ✅ ${differentImages} ❌`
+    if (process.env.GITHUB_ACTIONS) {
+      ghCore.summary.addRaw(countsText, true).write()
+      // set the job outputs
+      ghCore.setOutput('new_images', newImages)
+      ghCore.setOutput('matching_images', matchingImages)
+      ghCore.setOutput('different_images', differentImages)
+      const countsWords = `${newImages} new images ${matchingImages} matching ${differentImages} different`
+      ghCore.setOutput('visual_description', countsWords)
+      // match the github action status
+      ghCore.setOutput(
+        'visual_status',
+        differentImages > 0 ? 'failure' : 'success',
+      )
+    } else {
+      console.log(countsText)
     }
   })
 
@@ -232,8 +238,18 @@ export function setupVisualTesting(on, config) {
       return null
     },
 
-    diffImage(options) {
-      return diffAnImage(options, config)
+    async diffImage(options) {
+      const result = await diffAnImage(options, config)
+
+      if (result.newImage) {
+        newImages += 1
+      } else if (result.match === true) {
+        matchingImages += 1
+      } else {
+        differentImages += 1
+      }
+
+      return result
     },
   })
 }
