@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
+    "module": "commonjs",
     "types": ["cypress", "node"],
     "target": "es2021",
     "strict": false,
