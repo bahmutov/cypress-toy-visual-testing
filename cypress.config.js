@@ -6,6 +6,7 @@ module.exports = defineConfig({
     // baseUrl, etc
     supportFile: false,
     fixturesFolder: false,
+    scrollBehavior: 'center',
     setupNodeEvents(on, config) {
       setupVisualTesting(on, config)
 

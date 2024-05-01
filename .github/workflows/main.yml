@@ -20,6 +20,9 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           build: npm run build
+          # if there is no gold image to compare a screenshot to
+          # it is a problem, and we should fail the tests
+          env: failOnMissingGoldImage=true
 
       # after the test run completes store the screenshots and diffs
       - name: Save screenshots 📸

@@ -1,0 +1,68 @@
+name: ci
+on:
+  # run these tests when pushing to any branch except main
+  # because we can update the gold images in the branch
+  push:
+    branches-ignore:
+      - main
+jobs:
+  e2e:
+    runs-on: ubuntu-22.04
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+      statuses: write
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Set pending visual status 🎨
+        # https://github.com/myrotvorets/set-commit-status-action
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: Visual
+          description: Visual tests are running
+
+      # https://github.com/cypress-io/github-action
+      - name: Cypress tests 🧪
+        uses: cypress-io/github-action@v6
+        id: e2e
+        with:
+          build: npm run build
+
+      # set the final visual status for the current commit
+      # using myrotvorets/set-commit-status-action action
+      # based on the status set in the "e2e" step
+      - name: Set the final visual status 🎨
+        # https://github.com/myrotvorets/set-commit-status-action
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ steps.e2e.outputs.visual_status }}
+          context: Visual
+          description: ${{ steps.e2e.outputs.visual_description }}
+
+      # after the test run completes store the screenshots and diffs
+      - name: Save screenshots 📸
+        uses: actions/upload-artifact@v4
+        # always upload the screenshots, even if the tests fail
+        if: always()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Add changed gold images to source control 🏆
+        # https://github.com/stefanzweifel/git-auto-commit-action
+        uses: stefanzweifel/git-auto-commit-action@v5
+        # always add any changed or new gold images
+        # to the source control so the user can review them
+        # in the pull request
+        if: always()
+        with:
+          commit_message: updated gold images
+          file_pattern: cypress/gold
