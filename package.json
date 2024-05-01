@@ -1,6 +1,6 @@
 {
   "name": "@bahmutov/cypress-toy-visual-testing",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "A simple local visual testing for Cypress users",
   "types": "src/support/index.d.ts",
   "files": [
@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "cypress run"
+    "test": "cypress run",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "cypress",
@@ -34,6 +35,11 @@
     "@types/node": "^20.12.7",
     "cypress": "^13.8.1",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "semantic-release": "^23.0.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bahmutov/cypress-toy-visual-testing.git"
   }
 }
