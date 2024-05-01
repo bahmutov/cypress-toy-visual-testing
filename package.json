@@ -5,6 +5,7 @@
   "types": "src/support/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "watch": "tsc --watch",
     "test": "cypress run"
   },
   "keywords": [
@@ -15,10 +16,15 @@
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@actions/core": "^1.10.1",
+    "console.table": "^0.10.0",
     "fastify": "^4.26.2",
-    "odiff-bin": "^2.6.1"
+    "lodash": "^4.17.21",
+    "odiff-bin": "^2.6.1",
+    "pluralize": "^8.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
     "cypress": "^13.8.1",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"

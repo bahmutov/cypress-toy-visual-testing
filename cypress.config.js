@@ -1,4 +1,5 @@
 const { defineConfig } = require('cypress')
+const { setupVisualTesting } = require('./dist/plugin/setup')
 
 module.exports = defineConfig({
   e2e: {
@@ -6,8 +7,9 @@ module.exports = defineConfig({
     supportFile: false,
     fixturesFolder: false,
     setupNodeEvents(on, config) {
-      // implement node event listeners here
-      // and load any plugins that require the Node environment
+      setupVisualTesting(on, config)
+
+      return config
     },
-  }
+  },
 })
