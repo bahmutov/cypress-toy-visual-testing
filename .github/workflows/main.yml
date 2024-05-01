@@ -1,5 +1,8 @@
 name: main
-on: push
+on:
+  push:
+    branches:
+      - main
 jobs:
   test-and-release:
     runs-on: ubuntu-22.04
@@ -26,11 +29,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Add changed source files to the source control 🏆
-        # https://github.com/stefanzweifel/git-auto-commit-action
-        uses: stefanzweifel/git-auto-commit-action@v5
-        if: always()
-        with:
-          commit_message: updated dist sources
-          file_pattern: dist
