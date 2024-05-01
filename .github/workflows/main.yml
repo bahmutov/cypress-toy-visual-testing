@@ -7,6 +7,11 @@ jobs:
       - name: Checkout 🛎
         uses: actions/checkout@v4
 
+      - name: Set up Node.js 🚀
+        uses: actions/setup-node@v1
+        with:
+          node-version: '20'
+
       - name: Run Cypress tests 🧪
         # https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
@@ -22,4 +27,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # TODO: commit any changed files back to the repository
+      - name: Add changed source files to the source control 🏆
+        # https://github.com/stefanzweifel/git-auto-commit-action
+        uses: stefanzweifel/git-auto-commit-action@v5
+        if: always()
+        with:
+          commit_message: updated dist sources
+          file_pattern: dist
