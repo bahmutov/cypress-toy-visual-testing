@@ -1,5 +1,4 @@
-// @ts-ignore
-import path from 'path'
+import * as path from 'path'
 
 const goldImages = 'cypress/gold'
 
