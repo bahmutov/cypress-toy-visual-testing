@@ -75,7 +75,7 @@ Cypress.Commands.add(
       // the application under test
       const applicationIframe =
         window.parent.document.querySelector('.aut-iframe')
-      console.log('app iframe', applicationIframe)
+      // console.log('app iframe', applicationIframe)
       const { x, y, width, height } = applicationIframe!.getBoundingClientRect()
       screenshotOptions.clip = {
         x,
@@ -100,13 +100,13 @@ Cypress.Commands.add(
           .replaceAll('.', '-')
 
         const mode = Cypress.config('isTextTerminal') ? 'run' : 'open'
-        const goldPath = path.join(
+        const fullGoldPath = path.join(
           goldImages,
           goldNameFolder,
           Cypress.platform,
           mode,
         )
-        const diffName = path.join(goldPath, `${name}.png`)
+        const diffName = path.join(fullGoldPath, `${name}.png`)
         const relativeScreenshotPath = path.relative(rootFolder, screenshotPath)
 
         const diffOptions = {
@@ -161,12 +161,18 @@ Cypress.Commands.add(
                 cy.readFile(result.diffImagePath, 'base64', {
                   log: false,
                 }).then((diffImage) => {
-                  cy.document({ log: false })
-                    .its('body', { log: false })
-                    .then((el) => {
-                      // if element is not a jQuery object, convert it
-                      const $body = Cypress.$(el)
-                      const approveImage = `
+                  cy.readFile(relativeScreenshotPath, 'base64', {
+                    log: false,
+                  }).then((screenshotImage) => {
+                    cy.readFile(diffName, 'base64', {
+                      log: false,
+                    }).then((goldImage) => {
+                      cy.document({ log: false })
+                        .its('body', { log: false })
+                        .then((el) => {
+                          // if element is not a jQuery object, convert it
+                          const $body = Cypress.$(el)
+                          const approveImage = `
                         const options = {
                           screenshotPath: '${relativeScreenshotPath}',
                           goldPath: '${diffName}',
@@ -182,32 +188,100 @@ Cypress.Commands.add(
                           document.getElementById('approve-image').innerText = '✅ approved'
                         })
                       `
-                      // reset the body styles to make sure the diff image
-                      // is 100% by 100%
-                      $body.css({
-                        background: 'null',
-                        padding: '0',
-                        margin: '0',
-                        width: '100%',
-                      })
+                          const showScreenshotImage = `
+                        document.querySelectorAll('button.diff-button').forEach((btn) => {
+                          btn.classList.remove('selected')
+                        })
+                        document.getElementById('screenshot-image').classList.add('selected')
+                        document.getElementById('current-diff-image').src = 'data:image/png;base64,${screenshotImage}'
+                      `
+                          const showGoldImage = `
+                        document.querySelectorAll('button.diff-button').forEach((btn) => {
+                          btn.classList.remove('selected')
+                        })
+                        document.getElementById('gold-image').classList.add('selected')
+                        document.getElementById('current-diff-image').src = 'data:image/png;base64,${goldImage}'
+                      `
+                          const showDiffImage = `
+                        document.querySelectorAll('button.diff-button').forEach((btn) => {
+                          btn.classList.remove('selected')
+                        })
+                        document.getElementById('diff-image').classList.add('selected')
+                        document.getElementById('current-diff-image').src = 'data:image/png;base64,${diffImage}'
+                      `
 
-                      // remove all class names
-                      $body.attr('class', '')
-                      const approveButtonStyle =
-                        'position:fixed;top:20px;right:20px;padding:10px;border-radius:3px;background-color:white;border:1px solid gray;'
+                          // reset the body styles to make sure the diff image
+                          // is 100% by 100%
+                          $body.css({
+                            background: 'null',
+                            padding: '0',
+                            margin: '0',
+                            width: '100%',
+                          })
 
-                      $body[0].innerHTML =
-                        '<img style="width:100%" src="data:image/png;base64,' +
-                        diffImage +
-                        '"/><button id="approve-image" style="' +
-                        approveButtonStyle +
-                        '" onclick="' +
-                        approveImage +
-                        '" title="Approve new image">👍</button>'
-                      throw new Error(
-                        `image "${name}" did not match the gold image`,
-                      )
+                          // remove all class names
+                          $body.attr('class', '')
+                          const styles = `
+                        button.diff-button {
+                          margin-right:10px;
+                          padding:5px 10px;
+                          border-radius:3px;
+                          background-color:white;
+                          border:1px solid lightGray;
+                        }
+                        button.diff-button:hover {
+                          background-color:lightGray;
+                        }
+                        button.diff-button.selected {
+                          background-color: gray;
+                          border-color: black;
+                        }
+                      `
+
+                          const buttonsStyle =
+                            'position:fixed;top:20px;right:20px;'
+
+                          const screenshotImageButton =
+                            '<button id="screenshot-image" class="diff-button" onclick="' +
+                            showScreenshotImage +
+                            '" title="Current screenshot">📸</button>'
+
+                          const goldImageButton =
+                            '<button id="gold-image" class="diff-button" onclick="' +
+                            showGoldImage +
+                            '" title="Gold image">🖼️</button>'
+
+                          const diffImageButton =
+                            '<button id="diff-image" class="diff-button selected" onclick="' +
+                            showDiffImage +
+                            '" title="Diff image">👀</button>'
+
+                          const approveButton =
+                            '<button id="approve-image" class="diff-button" onclick="' +
+                            approveImage +
+                            '" title="Approve new image">👍</button>'
+
+                          $body[0].innerHTML =
+                            '<style>' +
+                            styles +
+                            '</style>' +
+                            '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
+                            diffImage +
+                            '"/>' +
+                            '<div style="' +
+                            buttonsStyle +
+                            '">' +
+                            screenshotImageButton +
+                            goldImageButton +
+                            diffImageButton +
+                            approveButton +
+                            '</div>'
+                          throw new Error(
+                            `image "${name}" did not match the gold image`,
+                          )
+                        })
                     })
+                  })
                 })
               }
             }

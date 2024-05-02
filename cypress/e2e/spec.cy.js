@@ -19,3 +19,14 @@ it(
     // the screenshot "body" should not have the 'foo' class
   },
 )
+
+it.skip(
+  'shows buttons on failure',
+  { viewportWidth: 700, viewportHeight: 400 },
+  () => {
+    cy.get('body')
+      .invoke('html', '<h1>Hello, world 5!</h1>')
+      .invoke('addClass', 'foo')
+    cy.imageDiff('buttons on failure')
+  },
+)
