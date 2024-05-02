@@ -163,32 +163,45 @@ Cypress.Commands.add(
                 }).then((diffImage) => {
                   cy.document({ log: false })
                     .its('body', { log: false })
-                    .then((body) => {
+                    .then((el) => {
+                      // if element is not a jQuery object, convert it
+                      const $body = Cypress.$(el)
                       const approveImage = `
-                  const options = {
-                    screenshotPath: '${relativeScreenshotPath}',
-                    goldPath: '${diffName}',
-                  }
-                  console.log('approved image')
-                  console.log(options)
-                  fetch('http://localhost:9555/approve', {
-                    method: 'POST',
-                    cors: 'cors',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(options),
-                  }).then(() => {
-                    document.getElementById('approve-image').innerText = '✅ approved'
-                  })
-                `
-                      body.innerHTML =
+                        const options = {
+                          screenshotPath: '${relativeScreenshotPath}',
+                          goldPath: '${diffName}',
+                        }
+                        fetch('http://localhost:9555/approve', {
+                          method: 'POST',
+                          cors: 'cors',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify(options),
+                        }).then(() => {
+                          document.getElementById('approve-image').innerText = '✅ approved'
+                        })
+                      `
+                      // reset the body styles to make sure the diff image
+                      // is 100% by 100%
+                      $body.css({
+                        background: 'null',
+                        padding: '0',
+                        margin: '0',
+                        width: '100%',
+                      })
+
+                      // remove all class names
+                      $body.attr('class', '')
+                      $body[0].innerHTML =
                         '<img style="width:100%" src="data:image/png;base64,' +
                         diffImage +
                         '"/><button id="approve-image" style="position:fixed;top:20px;right:20px;" onclick="' +
                         approveImage +
                         '" title="Approve new image">👍</button>'
-                      throw new Error('images do not match')
+                      throw new Error(
+                        `image "${name}" did not match the gold image`,
+                      )
                     })
                 })
               }
