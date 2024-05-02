@@ -193,10 +193,15 @@ Cypress.Commands.add(
 
                       // remove all class names
                       $body.attr('class', '')
+                      const approveButtonStyle =
+                        'position:fixed;top:20px;right:20px;padding:10px;border-radius:3px;background-color:white;border:1px solid gray;'
+
                       $body[0].innerHTML =
                         '<img style="width:100%" src="data:image/png;base64,' +
                         diffImage +
-                        '"/><button id="approve-image" style="position:fixed;top:20px;right:20px;" onclick="' +
+                        '"/><button id="approve-image" style="' +
+                        approveButtonStyle +
+                        '" onclick="' +
                         approveImage +
                         '" title="Approve new image">👍</button>'
                       throw new Error(
