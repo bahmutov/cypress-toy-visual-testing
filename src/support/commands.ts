@@ -222,24 +222,28 @@ Cypress.Commands.add(
                           // remove all class names
                           $body.attr('class', '')
                           const styles = `
-                        button.diff-button {
-                          margin-right:10px;
-                          padding:5px 10px;
-                          border-radius:3px;
-                          background-color:white;
-                          border:1px solid lightGray;
-                        }
-                        button.diff-button:hover {
-                          background-color:lightGray;
-                        }
-                        button.diff-button.selected {
-                          background-color: gray;
-                          border-color: black;
-                        }
-                      `
-
-                          const buttonsStyle =
-                            'position:fixed;top:20px;right:20px;'
+                            .diff-buttons {
+                              position:fixed;
+                              top:20px;
+                              right:10px;
+                              display: flex;
+                              flex-direction: row;
+                            }
+                            button.diff-button {
+                              margin-right:10px;
+                              padding:5px 10px;
+                              border-radius:3px;
+                              background-color:white;
+                              border:1px solid lightGray;
+                            }
+                            button.diff-button:hover {
+                              background-color:lightGray;
+                            }
+                            button.diff-button.selected {
+                              background-color: gray;
+                              border-color: black;
+                            }
+                          `
 
                           const screenshotImageButton =
                             '<button id="screenshot-image" class="diff-button" onclick="' +
@@ -268,9 +272,7 @@ Cypress.Commands.add(
                             '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
                             diffImage +
                             '"/>' +
-                            '<div style="' +
-                            buttonsStyle +
-                            '">' +
+                            '<div class="diff-buttons">' +
                             screenshotImageButton +
                             goldImageButton +
                             diffImageButton +
