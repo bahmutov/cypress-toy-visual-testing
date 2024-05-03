@@ -28,6 +28,9 @@ jobs:
           # it is a problem, and we should fail the tests
           env: failOnMissingGoldImage=true
 
+      - name: Check types 🏷️
+        run: npm run lint
+
       # after the test run completes store the screenshots and diffs
       - name: Save screenshots 📸
         uses: actions/upload-artifact@v4

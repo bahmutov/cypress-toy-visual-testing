@@ -1,3 +1,4 @@
+// @ts-check
 /// <reference path="../../src/support/index.d.ts" />
 
 import '../../dist/support/commands'
