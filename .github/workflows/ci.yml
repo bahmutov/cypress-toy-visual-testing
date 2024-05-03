@@ -49,7 +49,7 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ steps.e2e.outputs.visual_status }}
+          status: ${{ steps.e2e.outputs.visual_status || 'failure' }}
           context: Visual
           description: ${{ steps.e2e.outputs.visual_description }}
 
