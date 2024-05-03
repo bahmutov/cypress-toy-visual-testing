@@ -23,7 +23,9 @@ jobs:
         # https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
         with:
-          build: npm run build
+          build: |
+            npm run build
+            npm run lint
           # if there is no gold image to compare a screenshot to
           # it is a problem, and we should fail the tests
           env: failOnMissingGoldImage=true

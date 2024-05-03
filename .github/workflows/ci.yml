@@ -36,7 +36,9 @@ jobs:
         uses: cypress-io/github-action@v6
         id: e2e
         with:
-          build: npm run build
+          build: |
+            npm run build
+            npm run lint
 
       # set the final visual status for the current commit
       # using myrotvorets/set-commit-status-action action
