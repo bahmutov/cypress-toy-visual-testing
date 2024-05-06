@@ -12,11 +12,12 @@ type ImageDiffOptions = {
   ignoreElements?: string | string[]
   /**
    * By default, we capture the entire application in pieces and then
-   * stitch the pieces together. This is necessary when the application
+   * stitch the pieces together ('fullPage' mode). This is necessary when the application
    * is too large for the viewport. If you want to _only_ capture the
-   * application's viewport, set this option to "clipToViewport".
+   * application's viewport via the full test runner screenshot and then clip it,
+   * set this option to "clipToViewport".
    */
-  capture?: 'clipToViewport'
+  capture?: 'clipToViewport' | 'fullPage' | 'viewport'
 }
 
 declare namespace Cypress {

@@ -19,6 +19,11 @@ it(
     `
 
     cy.get('body').invoke('html', page)
+    // by default it is the full page
     cy.imageDiff('tall-page')
+    // only capture the viewport
+    cy.imageDiff('tall-page-viewport', { capture: 'viewport' })
+    // capture the runner then clip
+    cy.imageDiff('tall-page-viewport-clip', { capture: 'clipToViewport' })
   },
 )
