@@ -47,3 +47,9 @@ Take full page screenshots
 ```js
 cy.imageDiff('added-todos')
 ```
+
+### Capture options
+
+- `fullPage` (default) takes screenshots of the entire page and stitches them into a single image
+- `viewport` takes the screenshot of the currently visible portion
+- `clipToViewport` takes the screenshot of the entire test runner and the clips the image to the viewport.
