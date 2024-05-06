@@ -62,7 +62,8 @@ Cypress.Commands.add(
       Cypress.ScreenshotOptions & Cypress.Loggable
     > = {
       overwrite: true,
-      capture: options.capture === 'clipToViewport' ? 'runner' : 'viewport',
+      // capture the entire application under test
+      capture: options.capture === 'clipToViewport' ? 'runner' : 'fullPage',
       onAfterScreenshot($el, screenshot) {
         screenshotPath = screenshot.path
       },
