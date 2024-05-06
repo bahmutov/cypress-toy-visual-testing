@@ -53,3 +53,22 @@ cy.imageDiff('added-todos')
 - `fullPage` (default) takes screenshots of the entire page and stitches them into a single image
 - `viewport` takes the screenshot of the currently visible portion
 - `clipToViewport` takes the screenshot of the entire test runner and the clips the image to the viewport.
+
+## CI options
+
+The following Cypress env variables can change how the image diffs are approved or rejected:
+
+- `updateGoldImages` overwrites the gold images with the new screenshots, even if there are differences. Useful for branches in the pull request to overwrite the images which can be then added to the source branch. Then the user can see the difference between the changed gold images and the main branch's gold images.
+
+- `failOnMissingGoldImage`, default `false` can be used to automatically fail the `cy.imageDiff` if the screenshot does not have a gold image to compare itself to. For example, on the `main` branch, we could require all gold images to be present.
+
+```yml
+- name: Run Cypress tests 🧪
+  # https://github.com/cypress-io/github-action
+  uses: cypress-io/github-action@v6
+  with:
+    start: npm start
+    # if there is no gold image to compare a screenshot to
+    # it is a problem, and we should fail the tests
+    env: failOnMissingGoldImage=true
+```
