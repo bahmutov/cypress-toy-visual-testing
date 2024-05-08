@@ -246,7 +246,22 @@ export function setupVisualTesting(on, config) {
       } else if (result.match === true) {
         matchingImages += 1
       } else {
-        differentImages += 1
+        if ('diffPercentage' in options && options.diffPercentage > 0) {
+          if (result.diffPercentage < options.diffPercentage) {
+            console.log(
+              '👍 Image %s diff %d is within diff percentage %d',
+              options.name,
+              result.diffPercentage,
+              options.diffPercentage,
+            )
+            matchingImages += 1
+            result.match = true
+          } else {
+            differentImages += 1
+          }
+        } else {
+          differentImages += 1
+        }
       }
 
       return result

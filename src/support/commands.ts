@@ -125,6 +125,7 @@ Cypress.Commands.add(
           goldPath: diffName,
           relativeSpecName: Cypress.spec.relative,
           ignoreRegions,
+          diffPercentage: options.diffPercentage,
         }
 
         if (options.mode === 'async') {
