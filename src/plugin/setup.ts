@@ -63,7 +63,9 @@ async function diffAnImage(options, config) {
     } else {
       console.log('diffing %s and %s', screenshotPath, goldPath)
     }
-    console.log('with result diff in image %s', diffImagePath)
+    const projectRoot = config.projectRoot
+    const relativeDiffImageName = path.relative(projectRoot, diffImagePath)
+    console.log('with result diff in image %s', relativeDiffImageName)
     console.dir(result)
 
     // if we work on a PR we want to update the Gold images
