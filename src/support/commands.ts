@@ -132,13 +132,18 @@ Cypress.Commands.add(
           cy.log(`will diff image ${relativeScreenshotPath} later 👋`)
           cy.task('rememberToDiffImage', diffOptions)
         } else {
+          let message = `diffing ${relativeScreenshotPath} against ${diffName}`
           if (ignoreElementsMessage) {
+            message += ` while ignoring elements ${ignoreElementsMessage}`
             cy.log(
               `diffing ${relativeScreenshotPath} against ${diffName} while ignoring elements ${ignoreElementsMessage}`,
             )
-          } else {
-            cy.log(`diffing ${relativeScreenshotPath} against ${diffName}`)
           }
+          if (options.diffPercentage > 0) {
+            message += ` with max ${options.diffPercentage}% difference`
+          }
+
+          cy.log(message)
           cy.task<ODiffResult>('diffImage', diffOptions).then((result) => {
             // report the image diffing result, which could be
             // 1: a new image (no previous gold image found)
