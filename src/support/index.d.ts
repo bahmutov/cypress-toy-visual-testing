@@ -18,6 +18,12 @@ type ImageDiffOptions = {
    * set this option to "clipToViewport".
    */
   capture?: 'clipToViewport' | 'fullPage' | 'viewport'
+  /**
+   * The percentage difference allowed between the images.
+   * For example, let's ignore images that are less than 1% different.
+   * @example cy.imageDiff('name', { diffPercentage: 1 })
+   */
+  diffPercentage?: number
 }
 
 declare namespace Cypress {

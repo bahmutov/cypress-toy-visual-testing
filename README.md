@@ -53,6 +53,13 @@ cy.imageDiff('added-todos')
 - `fullPage` (default) takes screenshots of the entire page and stitches them into a single image
 - `viewport` takes the screenshot of the currently visible portion
 - `clipToViewport` takes the screenshot of the entire test runner and the clips the image to the viewport.
+- `diffPercentage` lets you ignore image differences for up to N percent of pixels
+
+For example, let's ignore all image differences for up to half a percentage of pixels
+
+```js
+cy.imageDiff('app', { diffPercentage: 0.5 })
+```
 
 ## CI options
 
