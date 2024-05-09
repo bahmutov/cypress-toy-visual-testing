@@ -3,14 +3,20 @@ import * as path from 'path'
 const goldImages = 'cypress/gold'
 
 type ODiffResult =
-  | { match: true; reason?: string }
-  | { match: true; newImage: true; reason: 'Copied new image to gold' }
+  | { match: true; reason?: string; elapsed: number }
+  | {
+      match: true
+      newImage: true
+      elapsed: number
+      reason: 'Copied new image to gold'
+    }
   | {
       match: false
       result: string
       reason: string
       diffPercentage: number
       diffImagePath: string
+      elapsed: number
     }
 
 type IgnoreRegion = {
@@ -160,13 +166,13 @@ Cypress.Commands.add(
               if ('newImage' in result && result.newImage) {
                 cy.log('🖼️ new gold image')
               } else {
-                cy.log('✅ images match')
+                cy.log(`✅ images match, took ${result.elapsed}ms`)
                 if (result.reason) {
                   cy.log(result.reason)
                 }
               }
             } else {
-              cy.log('🔥 images do not match')
+              cy.log(`🔥 images do not match, took ${result.elapsed}ms`)
               if (result.reason === 'pixel-diff') {
                 cy.log(`pixels different: ${result.diffPercentage}`)
                 const relativeDiffPath = path.relative(
