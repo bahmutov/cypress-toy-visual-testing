@@ -34,6 +34,7 @@ async function diffAnImage(options, config) {
       match: true,
       newImage: true,
       reason: 'Copied new image to gold',
+      elapsed: 0,
     }
   } else {
     const basename = path.basename(screenshotPath, '.png')
@@ -47,21 +48,32 @@ async function diffAnImage(options, config) {
       threshold: 0.1,
       ignoreRegions: options.ignoreRegions,
     }
+
+    const started = +Date.now()
     const result = await compare(
       goldPath,
       screenshotPath,
       diffImagePath,
       odiffOptions,
     )
+    const finished = +Date.now()
+    const elapsed = finished - started
+
     if (options.ignoreRegions && options.ignoreRegions.length) {
       console.log(
-        'diffing %s and %s with %d ignored regions',
+        'diffing %s and %s with %d ignored regions, took %dms',
         screenshotPath,
         goldPath,
         options.ignoreRegions.length,
+        elapsed,
       )
     } else {
-      console.log('diffing %s and %s', screenshotPath, goldPath)
+      console.log(
+        'diffing %s and %s, took %dms',
+        screenshotPath,
+        goldPath,
+        elapsed,
+      )
     }
     const projectRoot = config.projectRoot
     const relativeDiffImageName = path.relative(projectRoot, diffImagePath)
@@ -80,6 +92,7 @@ async function diffAnImage(options, config) {
     return {
       ...result,
       diffImagePath,
+      elapsed,
     }
   }
 }
