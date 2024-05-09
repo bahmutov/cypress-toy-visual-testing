@@ -29,7 +29,7 @@
     "console.table": "^0.10.0",
     "fastify": "^4.26.2",
     "lodash": "^4.17.21",
-    "odiff-bin": "^2.6.1",
+    "odiff-bin": "^3.0.0",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {
