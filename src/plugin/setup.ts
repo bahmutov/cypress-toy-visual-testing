@@ -50,6 +50,7 @@ async function diffAnImage(options, config) {
       failOnLayoutDiff: options.failOnLayoutDiff,
     }
 
+    console.log(odiffOptions)
     const started = +Date.now()
     const result = await compare(
       goldPath,
