@@ -47,6 +47,7 @@ async function diffAnImage(options, config) {
       antialiasing: true,
       threshold: 0.1,
       ignoreRegions: options.ignoreRegions,
+      failOnLayoutDiff: options.failOnLayoutDiff,
     }
 
     const started = +Date.now()

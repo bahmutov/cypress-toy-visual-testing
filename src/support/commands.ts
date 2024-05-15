@@ -132,6 +132,8 @@ Cypress.Commands.add(
           relativeSpecName: Cypress.spec.relative,
           ignoreRegions,
           diffPercentage: options.diffPercentage,
+          failOnLayoutDiff:
+            'failOnLayoutDiff' in options ? options.failOnLayoutDiff : true,
         }
 
         if (options.mode === 'async') {
