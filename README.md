@@ -54,6 +54,7 @@ cy.imageDiff('added-todos')
 - `viewport` takes the screenshot of the currently visible portion
 - `clipToViewport` takes the screenshot of the entire test runner and the clips the image to the viewport.
 - `diffPercentage` lets you ignore image differences for up to N percent of pixels
+- `failOnLayoutDiff` fails the image comparison if the dimensions differ, true by default
 
 For example, let's ignore all image differences for up to half a percentage of pixels
 

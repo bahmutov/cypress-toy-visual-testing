@@ -24,6 +24,11 @@ type ImageDiffOptions = {
    * @example cy.imageDiff('name', { diffPercentage: 1 })
    */
   diffPercentage?: number
+  /**
+   * Fail if the dimensions of the images are different.
+   * @default true
+   */
+  failOnLayoutDiff?: boolean
 }
 
 declare namespace Cypress {

@@ -47,8 +47,10 @@ async function diffAnImage(options, config) {
       antialiasing: true,
       threshold: 0.1,
       ignoreRegions: options.ignoreRegions,
+      failOnLayoutDiff: options.failOnLayoutDiff,
     }
 
+    console.log(odiffOptions)
     const started = +Date.now()
     const result = await compare(
       goldPath,

@@ -132,6 +132,8 @@ Cypress.Commands.add(
           relativeSpecName: Cypress.spec.relative,
           ignoreRegions,
           diffPercentage: options.diffPercentage,
+          failOnLayoutDiff:
+            'failOnLayoutDiff' in options ? options.failOnLayoutDiff : true,
         }
 
         if (options.mode === 'async') {
@@ -172,29 +174,30 @@ Cypress.Commands.add(
                 }
               }
             } else {
-              cy.log(`🔥 images do not match, took ${result.elapsed}ms`)
-              if (result.reason === 'pixel-diff') {
-                cy.log(`pixels different: ${result.diffPercentage}`)
-                const relativeDiffPath = path.relative(
-                  rootFolder,
-                  result.diffImagePath,
-                )
-                cy.log(relativeDiffPath)
-                cy.readFile(result.diffImagePath, 'base64', {
-                  log: false,
-                }).then((diffImage) => {
-                  cy.readFile(relativeScreenshotPath, 'base64', {
-                    log: false,
-                  }).then((screenshotImage) => {
-                    cy.readFile(diffName, 'base64', {
+              cy.log(`🔥 images do not match, took ${result.elapsed}ms`).then(
+                () => {
+                  if (result.reason === 'pixel-diff') {
+                    cy.log(`pixels different: ${result.diffPercentage}`)
+                    const relativeDiffPath = path.relative(
+                      rootFolder,
+                      result.diffImagePath,
+                    )
+                    cy.log(relativeDiffPath)
+                    cy.readFile(result.diffImagePath, 'base64', {
                       log: false,
-                    }).then((goldImage) => {
-                      cy.document({ log: false })
-                        .its('body', { log: false })
-                        .then((el) => {
-                          // if element is not a jQuery object, convert it
-                          const $body = Cypress.$(el)
-                          const approveImage = `
+                    }).then((diffImage) => {
+                      cy.readFile(relativeScreenshotPath, 'base64', {
+                        log: false,
+                      }).then((screenshotImage) => {
+                        cy.readFile(diffName, 'base64', {
+                          log: false,
+                        }).then((goldImage) => {
+                          cy.document({ log: false })
+                            .its('body', { log: false })
+                            .then((el) => {
+                              // if element is not a jQuery object, convert it
+                              const $body = Cypress.$(el)
+                              const approveImage = `
                         const options = {
                           screenshotPath: '${relativeScreenshotPath}',
                           goldPath: '${diffName}',
@@ -210,21 +213,21 @@ Cypress.Commands.add(
                           document.getElementById('approve-image').innerText = '✅ approved'
                         })
                       `
-                          const showScreenshotImage = `
+                              const showScreenshotImage = `
                         document.querySelectorAll('button.diff-button').forEach((btn) => {
                           btn.classList.remove('selected')
                         })
                         document.getElementById('screenshot-image').classList.add('selected')
                         document.getElementById('current-diff-image').src = 'data:image/png;base64,${screenshotImage}'
                       `
-                          const showGoldImage = `
+                              const showGoldImage = `
                         document.querySelectorAll('button.diff-button').forEach((btn) => {
                           btn.classList.remove('selected')
                         })
                         document.getElementById('gold-image').classList.add('selected')
                         document.getElementById('current-diff-image').src = 'data:image/png;base64,${goldImage}'
                       `
-                          const showDiffImage = `
+                              const showDiffImage = `
                         document.querySelectorAll('button.diff-button').forEach((btn) => {
                           btn.classList.remove('selected')
                         })
@@ -232,18 +235,18 @@ Cypress.Commands.add(
                         document.getElementById('current-diff-image').src = 'data:image/png;base64,${diffImage}'
                       `
 
-                          // reset the body styles to make sure the diff image
-                          // is 100% by 100%
-                          $body.css({
-                            background: 'null',
-                            padding: '0',
-                            margin: '0',
-                            width: '100%',
-                          })
+                              // reset the body styles to make sure the diff image
+                              // is 100% by 100%
+                              $body.css({
+                                background: 'null',
+                                padding: '0',
+                                margin: '0',
+                                width: '100%',
+                              })
 
-                          // remove all class names
-                          $body.attr('class', '')
-                          const styles = `
+                              // remove all class names
+                              $body.attr('class', '')
+                              const styles = `
                             .diff-buttons {
                               position:fixed;
                               top:20px;
@@ -267,47 +270,53 @@ Cypress.Commands.add(
                             }
                           `
 
-                          const screenshotImageButton =
-                            '<button id="screenshot-image" class="diff-button" onclick="' +
-                            showScreenshotImage +
-                            '" title="Current screenshot">📸</button>'
+                              const screenshotImageButton =
+                                '<button id="screenshot-image" class="diff-button" onclick="' +
+                                showScreenshotImage +
+                                '" title="Current screenshot">📸</button>'
 
-                          const goldImageButton =
-                            '<button id="gold-image" class="diff-button" onclick="' +
-                            showGoldImage +
-                            '" title="Gold image">🖼️</button>'
+                              const goldImageButton =
+                                '<button id="gold-image" class="diff-button" onclick="' +
+                                showGoldImage +
+                                '" title="Gold image">🖼️</button>'
 
-                          const diffImageButton =
-                            '<button id="diff-image" class="diff-button selected" onclick="' +
-                            showDiffImage +
-                            '" title="Diff image">👀</button>'
+                              const diffImageButton =
+                                '<button id="diff-image" class="diff-button selected" onclick="' +
+                                showDiffImage +
+                                '" title="Diff image">👀</button>'
 
-                          const approveButton =
-                            '<button id="approve-image" class="diff-button" onclick="' +
-                            approveImage +
-                            '" title="Approve new image">👍</button>'
+                              const approveButton =
+                                '<button id="approve-image" class="diff-button" onclick="' +
+                                approveImage +
+                                '" title="Approve new image">👍</button>'
 
-                          $body[0].innerHTML =
-                            '<style>' +
-                            styles +
-                            '</style>' +
-                            '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
-                            diffImage +
-                            '"/>' +
-                            '<div class="diff-buttons">' +
-                            screenshotImageButton +
-                            goldImageButton +
-                            diffImageButton +
-                            approveButton +
-                            '</div>'
-                          throw new Error(
-                            `image "${name}" did not match the gold image`,
-                          )
+                              $body[0].innerHTML =
+                                '<style>' +
+                                styles +
+                                '</style>' +
+                                '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
+                                diffImage +
+                                '"/>' +
+                                '<div class="diff-buttons">' +
+                                screenshotImageButton +
+                                goldImageButton +
+                                diffImageButton +
+                                approveButton +
+                                '</div>'
+                              throw new Error(
+                                `image "${name}" did not match the gold image`,
+                              )
+                            })
                         })
+                      })
                     })
-                  })
-                })
-              }
+                  } else {
+                    throw new Error(
+                      `image "${name}" mismatch due to ${result.reason}`,
+                    )
+                  }
+                },
+              )
             }
           })
         }
