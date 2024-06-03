@@ -6,6 +6,16 @@ const pluralize = require('pluralize')
 const ghCore = require('@actions/core')
 require('console.table')
 const fastify = require('fastify')
+const imageSize = require('image-size')
+
+type ImageSize = {
+  width: number
+  height: number
+}
+
+function imageSizeDiffer(image1: ImageSize, image2: ImageSize) {
+  return image1.width !== image2.width || image1.height !== image2.height
+}
 
 async function diffAnImage(options, config) {
   if (!options) {
@@ -52,6 +62,25 @@ async function diffAnImage(options, config) {
 
     console.log(odiffOptions)
     const started = +Date.now()
+    const goldImageSize = imageSize(goldPath)
+    const screenshotImageSize = imageSize(screenshotPath)
+    if (imageSizeDiffer(goldImageSize, screenshotImageSize)) {
+      console.log('image size difference:')
+      // use tab character to align the columns in the terminal
+      console.log(
+        '🖼️\t%dx%d gold image size %s',
+        goldImageSize.width,
+        goldImageSize.height,
+        goldPath,
+      )
+      console.log(
+        '📸\t%dx%d screenshot image size %s',
+        screenshotImageSize.width,
+        screenshotImageSize.height,
+        screenshotPath,
+      )
+    }
+
     const result = await compare(
       goldPath,
       screenshotPath,
