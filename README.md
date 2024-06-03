@@ -53,7 +53,7 @@ cy.imageDiff('added-todos')
 - `fullPage` (default) takes screenshots of the entire page and stitches them into a single image
 - `viewport` takes the screenshot of the currently visible portion
 - `clipToViewport` takes the screenshot of the entire test runner and the clips the image to the viewport.
-- `diffPercentage` lets you ignore image differences for up to N percent of pixels
+- `diffPercentage` lets you ignore image differences for up to N percent of pixels. If the diff is below this percentage, the gold image won't be overwritten
 - `failOnLayoutDiff` fails the image comparison if the dimensions differ, true by default
 
 For example, let's ignore all image differences for up to half a percentage of pixels

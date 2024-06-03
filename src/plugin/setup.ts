@@ -113,6 +113,21 @@ async function diffAnImage(options, config) {
 
     // if we work on a PR we want to update the Gold images
     // so that the user reviews the changes
+    if (result.match === false) {
+      if (
+        'diffPercentage' in options &&
+        options.diffPercentage > 0 &&
+        result.diffPercentage < options.diffPercentage
+      ) {
+        console.log(
+          'image difference below threshold %d',
+          options.diffPercentage,
+        )
+        result.match = true
+        result.reason = 'Diff below threshold'
+      }
+    }
+
     if (result.match === false && config.env.updateGoldImages) {
       console.log('Updating gold image %s', goldPath)
       fs.copyFileSync(screenshotPath, goldPath)
