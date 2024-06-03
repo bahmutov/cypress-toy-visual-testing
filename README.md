@@ -2,6 +2,10 @@
 
 > A simple local visual testing for Cypress users
 
+## Learn
+
+- 🎓 online course [Visual Testing With Cypress](https://cypress.tips/courses/visual-testing)
+
 ## Install
 
 Add this plugin as a dev dependency
