@@ -79,6 +79,7 @@ async function diffAnImage(options, config) {
         screenshotImageSize.height,
         screenshotPath,
       )
+      console.log('📲\t%d device pixel ratio', options.devicePixelRatio)
     }
 
     const result = await compare(
