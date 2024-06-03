@@ -10,8 +10,9 @@ it('reports timing', { viewportWidth: 300, viewportHeight: 100 }, () => {
   cy.get('@log').should((spy) => {
     // @ts-ignore
     const logMessages = spy.getCalls().map((call) => call.lastArg)
-    const message = logMessages.find((msg) =>
-      msg.match(/✅ images match, took \d+ms/),
+    const message = logMessages.find(
+      (msg) =>
+        msg.match(/✅ images match, took \d+ms/) || msg === '🖼️ new gold image',
     )
     expect(message, 'timing log message').to.be.a('string')
   })
