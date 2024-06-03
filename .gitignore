@@ -2,5 +2,8 @@ node_modules/
 dist
 cypress/screenshots/
 cypress/videos/
+
+# we do not care about Darwin screenshots since they can be different
+# just Linux CI gold images that are consistent
 cypress/gold/**/darwin/
 .DS_Store
