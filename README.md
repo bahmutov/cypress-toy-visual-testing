@@ -80,3 +80,14 @@ The following Cypress env variables can change how the image diffs are approved 
     # it is a problem, and we should fail the tests
     env: failOnMissingGoldImage=true
 ```
+
+## Development
+
+Use `npm run watch` to compile TS into JS
+
+Use the following icons to refer to images:
+
+- 🖼️ gold image
+- 📸 current screenshot
+- ✅ image match
+- 🔥 image mismatch
