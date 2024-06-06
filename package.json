@@ -31,6 +31,7 @@
     "image-size": "^1.1.1",
     "lodash": "^4.17.21",
     "odiff-bin": "^3.0.0",
+    "path-browserify": "^1.0.1",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {
