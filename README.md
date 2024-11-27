@@ -59,11 +59,21 @@ cy.imageDiff('added-todos')
 - `clipToViewport` takes the screenshot of the entire test runner and the clips the image to the viewport.
 - `diffPercentage` lets you ignore image differences for up to N percent of pixels. If the diff is below this percentage, the gold image won't be overwritten
 - `failOnLayoutDiff` fails the image comparison if the dimensions differ, true by default
+- `dimensionTolerance` allow each dimension to be different by this ratio if `failOnLayoutDiff: true`
 
 For example, let's ignore all image differences for up to half a percentage of pixels
 
 ```js
 cy.imageDiff('app', { diffPercentage: 0.5 })
+```
+
+Compare the images, allow each dimension to be within 5% of the gold image
+
+```js
+cy.imageDiff('app', {
+  failOnLayoutDiff: true,
+  dimensionTolerance: 0.05,
+})
 ```
 
 ## CI options

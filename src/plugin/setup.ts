@@ -105,6 +105,27 @@ async function diffAnImage(options, config) {
       )
     }
 
+    if (
+      options.failOnLayoutDiff &&
+      options.dimensionTolerance > 0 &&
+      dimensionDifference
+    ) {
+      if (
+        dimensionDifference.widthDiff > options.dimensionTolerance ||
+        dimensionDifference.heightDiff > options.dimensionTolerance
+      ) {
+        console.error(
+          'Image dimensions differ by more than %d%%',
+          options.dimensionTolerance * 100,
+        )
+        return {
+          match: false,
+          elapsed: 0,
+          reason: 'Image dimensions differ above tolerance',
+        }
+      }
+    }
+
     const result = await compare(
       goldPath,
       screenshotPath,

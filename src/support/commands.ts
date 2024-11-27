@@ -135,6 +135,7 @@ Cypress.Commands.add(
           devicePixelRatio,
           failOnLayoutDiff:
             'failOnLayoutDiff' in options ? options.failOnLayoutDiff : true,
+          dimensionTolerance: options.dimensionTolerance,
         }
 
         if (options.mode === 'async') {

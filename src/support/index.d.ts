@@ -29,6 +29,12 @@ type ImageDiffOptions = {
    * @default true
    */
   failOnLayoutDiff?: boolean
+  /**
+   * How much the images can differ in each dimension, relative.
+   * For example, 0.1 means the image widths could be 10% different
+   * @example cy.imageDiff('name', { dimensionTolerance: 0.1 })
+   */
+  dimensionTolerance?: number
 }
 
 declare namespace Cypress {
