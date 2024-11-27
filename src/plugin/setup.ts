@@ -14,7 +14,18 @@ type ImageSize = {
 }
 
 function imageSizeDiffer(image1: ImageSize, image2: ImageSize) {
-  return image1.width !== image2.width || image1.height !== image2.height
+  if (image1.width === image2.width && image1.height === image2.height) {
+    return false
+  }
+
+  // compute relative difference for each dimension
+  const widthDiff = Math.abs(image1.width - image2.width) / image1.width
+  const heightDiff = Math.abs(image1.height - image2.height) / image1.height
+
+  return {
+    widthDiff,
+    heightDiff,
+  }
 }
 
 async function diffAnImage(options, config) {
@@ -64,7 +75,14 @@ async function diffAnImage(options, config) {
     const started = +Date.now()
     const goldImageSize = imageSize(goldPath)
     const screenshotImageSize = imageSize(screenshotPath)
-    if (imageSizeDiffer(goldImageSize, screenshotImageSize)) {
+    const dimensionDifference = imageSizeDiffer(
+      goldImageSize,
+      screenshotImageSize,
+    )
+
+    if (dimensionDifference === false) {
+      // images are then exact same size
+    } else {
       console.log('image size difference:')
       // use tab character to align the columns in the terminal
       console.log(
@@ -80,6 +98,11 @@ async function diffAnImage(options, config) {
         screenshotPath,
       )
       console.log('📲\t%d device pixel ratio', options.devicePixelRatio)
+      console.log(
+        '📏\t%d width diff ratio %d height diff ratio',
+        dimensionDifference.widthDiff,
+        dimensionDifference.heightDiff,
+      )
     }
 
     const result = await compare(
