@@ -123,6 +123,11 @@ async function diffAnImage(options, config) {
           elapsed: 0,
           reason: 'Image dimensions differ above tolerance',
         }
+      } else {
+        console.log(
+          'Image dimensions differ within tolerance, disabling layout diff',
+        )
+        odiffOptions.failOnLayoutDiff = false
       }
     }
 
