@@ -16,3 +16,17 @@ it(
     })
   },
 )
+
+it(
+  'directs the odiff to ignore the layout differences below threshold',
+  // to produce screenshot with a different size
+  // change the viewport size
+  { viewportWidth: 300, viewportHeight: 105 },
+  () => {
+    cy.get('body').invoke('html', '<h1>Hello, world!</h1>')
+    cy.imageDiff('hello-world2', {
+      failOnLayoutDiff: true,
+      dimensionTolerance: 0.05,
+    })
+  },
+)
