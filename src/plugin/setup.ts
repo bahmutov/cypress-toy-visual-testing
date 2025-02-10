@@ -103,6 +103,17 @@ async function diffAnImage(options, config) {
         dimensionDifference.widthDiff,
         dimensionDifference.heightDiff,
       )
+
+      if (config.env.updateGoldImages) {
+        console.log('Updating gold image %s', goldPath)
+        fs.copyFileSync(screenshotPath, goldPath)
+        return {
+          match: true,
+          diffImagePath,
+          elapsed: 0,
+          reason: 'Updated gold image',
+        }
+      }
     }
 
     if (
