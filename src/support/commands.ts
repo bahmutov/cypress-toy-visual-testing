@@ -46,7 +46,7 @@ Cypress.Commands.add(
           .join(', ')
         // console.log('ignoring elements', options.ignoreElements.join(', '))
         // @ts-ignore
-        const win = cy.state('window')
+        const win: Window = cy.state('window')
         const doc = win.document
         options.ignoreElements.forEach((selector) => {
           // maybe we need to query all elements and loop through them
@@ -108,7 +108,10 @@ Cypress.Commands.add(
       // @ts-ignore
       .then(() => {
         const rootFolder = Cypress.config('projectRoot')
-        const specName = path.relative(rootFolder, Cypress.spec.absolute)
+        const specName: string = path.relative(
+          rootFolder,
+          Cypress.spec.absolute,
+        )
 
         const diffNameDirname = specName
         const goldNameFolder = diffNameDirname
@@ -116,14 +119,17 @@ Cypress.Commands.add(
           .replaceAll('.', '-')
 
         const mode = Cypress.config('isTextTerminal') ? 'run' : 'open'
-        const fullGoldPath = path.join(
+        const fullGoldPath: string = path.join(
           goldImages,
           goldNameFolder,
           Cypress.platform,
           mode,
         )
-        const diffName = path.join(fullGoldPath, `${name}.png`)
-        const relativeScreenshotPath = path.relative(rootFolder, screenshotPath)
+        const diffName: string = path.join(fullGoldPath, `${name}.png`)
+        const relativeScreenshotPath: string = path.relative(
+          rootFolder,
+          screenshotPath,
+        )
 
         const diffOptions = {
           name,
@@ -180,20 +186,20 @@ Cypress.Commands.add(
                 () => {
                   if (result.reason === 'pixel-diff') {
                     cy.log(`pixels different: ${result.diffPercentage}`)
-                    const relativeDiffPath = path.relative(
+                    const relativeDiffPath: string = path.relative(
                       rootFolder,
                       result.diffImagePath,
                     )
                     cy.log(relativeDiffPath)
                     cy.readFile(result.diffImagePath, 'base64', {
                       log: false,
-                    }).then((diffImage) => {
+                    }).then((diffImage: string) => {
                       cy.readFile(relativeScreenshotPath, 'base64', {
                         log: false,
-                      }).then((screenshotImage) => {
+                      }).then((screenshotImage: string) => {
                         cy.readFile(diffName, 'base64', {
                           log: false,
-                        }).then((goldImage) => {
+                        }).then((goldImage: string) => {
                           cy.document({ log: false })
                             .its('body', { log: false })
                             .then((el) => {
