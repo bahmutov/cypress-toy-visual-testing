@@ -185,7 +185,7 @@ Cypress.Commands.add(
               cy.log(`🔥 images do not match, took ${result.elapsed}ms`).then(
                 () => {
                   if (result.reason === 'pixel-diff') {
-                    cy.log(`pixels different: ${result.diffPercentage}`)
+                    cy.log(`pixels different: ${result.diffPercentage} %`)
                     const relativeDiffPath: string = path.relative(
                       rootFolder,
                       result.diffImagePath,
@@ -200,121 +200,132 @@ Cypress.Commands.add(
                         cy.readFile(diffName, 'base64', {
                           log: false,
                         }).then((goldImage: string) => {
+                          const log = Cypress.log({
+                            name: 'imageDiff',
+                            displayName: 'Image diff',
+                            autoEnd: false,
+                          })
+
                           cy.document({ log: false })
                             .its('body', { log: false })
                             .then((el) => {
                               // if element is not a jQuery object, convert it
                               const $body = Cypress.$(el)
-                              const approveImage = `
-                        const options = {
-                          screenshotPath: '${relativeScreenshotPath}',
-                          goldPath: '${diffName}',
-                        }
-                        fetch('http://localhost:9555/approve', {
-                          method: 'POST',
-                          cors: 'cors',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify(options),
-                        }).then(() => {
-                          document.getElementById('approve-image').innerText = '✅ approved'
-                        })
-                      `
-                              const showScreenshotImage = `
-                        document.querySelectorAll('button.diff-button').forEach((btn) => {
-                          btn.classList.remove('selected')
-                        })
-                        document.getElementById('screenshot-image').classList.add('selected')
-                        document.getElementById('current-diff-image').src = 'data:image/png;base64,${screenshotImage}'
-                      `
-                              const showGoldImage = `
-                        document.querySelectorAll('button.diff-button').forEach((btn) => {
-                          btn.classList.remove('selected')
-                        })
-                        document.getElementById('gold-image').classList.add('selected')
-                        document.getElementById('current-diff-image').src = 'data:image/png;base64,${goldImage}'
-                      `
-                              const showDiffImage = `
-                        document.querySelectorAll('button.diff-button').forEach((btn) => {
-                          btn.classList.remove('selected')
-                        })
-                        document.getElementById('diff-image').classList.add('selected')
-                        document.getElementById('current-diff-image').src = 'data:image/png;base64,${diffImage}'
-                      `
 
-                              // reset the body styles to make sure the diff image
-                              // is 100% by 100%
-                              $body.css({
-                                background: 'null',
-                                padding: '0',
-                                margin: '0',
-                                width: '100%',
-                              })
+                              if (Cypress.config('isInteractive')) {
+                                // we are running in the "cypress open" mode
+                                const approveImage = `
+                                  const options = {
+                                    screenshotPath: '${relativeScreenshotPath}',
+                                    goldPath: '${diffName}',
+                                  }
+                                  fetch('http://localhost:9555/approve', {
+                                    method: 'POST',
+                                    cors: 'cors',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify(options),
+                                  }).then(() => {
+                                    document.getElementById('approve-image').innerText = '✅ approved'
+                                  })
+                                `
+                                const showScreenshotImage = `
+                                  document.querySelectorAll('button.diff-button').forEach((btn) => {
+                                    btn.classList.remove('selected')
+                                  })
+                                  document.getElementById('screenshot-image').classList.add('selected')
+                                  document.getElementById('current-diff-image').src = 'data:image/png;base64,${screenshotImage}'
+                                `
+                                const showGoldImage = `
+                                  document.querySelectorAll('button.diff-button').forEach((btn) => {
+                                    btn.classList.remove('selected')
+                                  })
+                                  document.getElementById('gold-image').classList.add('selected')
+                                  document.getElementById('current-diff-image').src = 'data:image/png;base64,${goldImage}'
+                                `
+                                const showDiffImage = `
+                                  document.querySelectorAll('button.diff-button').forEach((btn) => {
+                                    btn.classList.remove('selected')
+                                  })
+                                  document.getElementById('diff-image').classList.add('selected')
+                                  document.getElementById('current-diff-image').src = 'data:image/png;base64,${diffImage}'
+                                `
 
-                              // remove all class names
-                              $body.attr('class', '')
-                              const styles = `
-                            .diff-buttons {
-                              position:fixed;
-                              top:20px;
-                              right:10px;
-                              display: flex;
-                              flex-direction: row;
-                            }
-                            button.diff-button {
-                              margin-right:10px;
-                              padding:5px 10px;
-                              border-radius:3px;
-                              background-color:white;
-                              border:1px solid lightGray;
-                            }
-                            button.diff-button:hover {
-                              background-color:lightGray;
-                            }
-                            button.diff-button.selected {
-                              background-color: gray;
-                              border-color: black;
-                            }
-                          `
+                                // reset the body styles to make sure the diff image
+                                // is 100% by 100%
+                                $body.css({
+                                  background: 'null',
+                                  padding: '0',
+                                  margin: '0',
+                                  width: '100%',
+                                })
 
-                              const screenshotImageButton =
-                                '<button id="screenshot-image" class="diff-button" onclick="' +
-                                showScreenshotImage +
-                                '" title="Current screenshot">📸</button>'
+                                // remove all class names
+                                $body.attr('class', '')
+                                const styles = `
+                                  .diff-buttons {
+                                    position:fixed;
+                                    top:20px;
+                                    right:10px;
+                                    display: flex;
+                                    flex-direction: row;
+                                  }
+                                  button.diff-button {
+                                    margin-right:10px;
+                                    padding:5px 10px;
+                                    border-radius:3px;
+                                    background-color:white;
+                                    border:1px solid lightGray;
+                                  }
+                                  button.diff-button:hover {
+                                    background-color:lightGray;
+                                  }
+                                  button.diff-button.selected {
+                                    background-color: gray;
+                                    border-color: black;
+                                  }
+                                `
 
-                              const goldImageButton =
-                                '<button id="gold-image" class="diff-button" onclick="' +
-                                showGoldImage +
-                                '" title="Gold image">🖼️</button>'
+                                const screenshotImageButton =
+                                  '<button id="screenshot-image" class="diff-button" onclick="' +
+                                  showScreenshotImage +
+                                  '" title="Current screenshot">📸</button>'
 
-                              const diffImageButton =
-                                '<button id="diff-image" class="diff-button selected" onclick="' +
-                                showDiffImage +
-                                '" title="Diff image">👀</button>'
+                                const goldImageButton =
+                                  '<button id="gold-image" class="diff-button" onclick="' +
+                                  showGoldImage +
+                                  '" title="Gold image">🖼️</button>'
 
-                              const approveButton =
-                                '<button id="approve-image" class="diff-button" onclick="' +
-                                approveImage +
-                                '" title="Approve new image">👍</button>'
+                                const diffImageButton =
+                                  '<button id="diff-image" class="diff-button selected" onclick="' +
+                                  showDiffImage +
+                                  '" title="Diff image">👀</button>'
 
-                              $body[0].innerHTML =
-                                '<style>' +
-                                styles +
-                                '</style>' +
-                                '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
-                                diffImage +
-                                '"/>' +
-                                '<div class="diff-buttons">' +
-                                screenshotImageButton +
-                                goldImageButton +
-                                diffImageButton +
-                                approveButton +
-                                '</div>'
+                                const approveButton =
+                                  '<button id="approve-image" class="diff-button" onclick="' +
+                                  approveImage +
+                                  '" title="Approve new image">👍</button>'
+
+                                $body[0].innerHTML =
+                                  '<style>' +
+                                  styles +
+                                  '</style>' +
+                                  '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
+                                  diffImage +
+                                  '"/>' +
+                                  '<div class="diff-buttons">' +
+                                  screenshotImageButton +
+                                  goldImageButton +
+                                  diffImageButton +
+                                  approveButton +
+                                  '</div>'
+                              }
                               throw new Error(
                                 `image "${name}" did not match the gold image`,
                               )
                             })
+                          log.end()
                         })
                       })
                     })
