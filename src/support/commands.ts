@@ -203,6 +203,7 @@ Cypress.Commands.add(
                           const log = Cypress.log({
                             name: 'imageDiff',
                             displayName: 'Image diff',
+                            type: 'parent',
                             autoEnd: false,
                           })
 
@@ -211,6 +212,63 @@ Cypress.Commands.add(
                             .then((el) => {
                               // if element is not a jQuery object, convert it
                               const $body = Cypress.$(el)
+
+                              // reset the body styles to make sure the diff image
+                              // is 100% by 100%
+                              $body.css({
+                                background: 'null',
+                                padding: '0',
+                                margin: '0',
+                                width: '100%',
+                              })
+
+                              // remove all class names
+                              $body.attr('class', '')
+                              const styles = `
+                                .diff-buttons {
+                                  position:fixed;
+                                  top:20px;
+                                  right:10px;
+                                  display: flex;
+                                  flex-direction: row;
+                                }
+                                button.diff-button {
+                                  margin-right:10px;
+                                  padding:5px 10px;
+                                  border-radius:3px;
+                                  background-color:white;
+                                  border:1px solid lightGray;
+                                }
+                                button.diff-button:hover {
+                                  background-color:lightGray;
+                                }
+                                button.diff-button.selected {
+                                  background-color: gray;
+                                  border-color: black;
+                                }
+                              `
+
+                              $body[0].innerHTML =
+                                '<style>' +
+                                styles +
+                                '</style>' +
+                                '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
+                                screenshotImage +
+                                '"/>'
+                              log.snapshot('current', {
+                                at: 0,
+                                next: 'gold image',
+                              })
+                              // @ts-ignore
+                              const doc = cy.state('document')
+                              doc.getElementById('current-diff-image').src =
+                                `data:image/png;base64,${goldImage}`
+                              log.snapshot('gold image')
+                              doc.getElementById('current-diff-image').src =
+                                `data:image/png;base64,${diffImage}`
+                              log.snapshot('diff image').end()
+
+                              // show the current image in the browser and take the DOM snapshot
 
                               if (Cypress.config('isInteractive')) {
                                 // we are running in the "cypress open" mode
@@ -252,41 +310,6 @@ Cypress.Commands.add(
                                   document.getElementById('current-diff-image').src = 'data:image/png;base64,${diffImage}'
                                 `
 
-                                // reset the body styles to make sure the diff image
-                                // is 100% by 100%
-                                $body.css({
-                                  background: 'null',
-                                  padding: '0',
-                                  margin: '0',
-                                  width: '100%',
-                                })
-
-                                // remove all class names
-                                $body.attr('class', '')
-                                const styles = `
-                                  .diff-buttons {
-                                    position:fixed;
-                                    top:20px;
-                                    right:10px;
-                                    display: flex;
-                                    flex-direction: row;
-                                  }
-                                  button.diff-button {
-                                    margin-right:10px;
-                                    padding:5px 10px;
-                                    border-radius:3px;
-                                    background-color:white;
-                                    border:1px solid lightGray;
-                                  }
-                                  button.diff-button:hover {
-                                    background-color:lightGray;
-                                  }
-                                  button.diff-button.selected {
-                                    background-color: gray;
-                                    border-color: black;
-                                  }
-                                `
-
                                 const screenshotImageButton =
                                   '<button id="screenshot-image" class="diff-button" onclick="' +
                                   showScreenshotImage +
@@ -325,7 +348,6 @@ Cypress.Commands.add(
                                 `image "${name}" did not match the gold image`,
                               )
                             })
-                          log.end()
                         })
                       })
                     })
