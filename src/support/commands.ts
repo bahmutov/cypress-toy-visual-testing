@@ -205,7 +205,7 @@ Cypress.Commands.add(
                             displayName: 'Image diff',
                             type: 'parent',
                             autoEnd: false,
-                          })
+                          }).snapshot('DOM')
 
                           cy.document({ log: false })
                             .its('body', { log: false })
@@ -255,10 +255,7 @@ Cypress.Commands.add(
                                 '<img id="current-diff-image" style="width:100%" src="data:image/png;base64,' +
                                 screenshotImage +
                                 '"/>'
-                              log.snapshot('current', {
-                                at: 0,
-                                next: 'gold image',
-                              })
+                              log.snapshot('current image')
                               // @ts-ignore
                               const doc = cy.state('document')
                               doc.getElementById('current-diff-image').src =
@@ -266,7 +263,6 @@ Cypress.Commands.add(
                               log.snapshot('gold image')
                               doc.getElementById('current-diff-image').src =
                                 `data:image/png;base64,${diffImage}`
-                              log.snapshot('diff image').end()
 
                               // show the current image in the browser and take the DOM snapshot
 
@@ -344,9 +340,13 @@ Cypress.Commands.add(
                                   approveButton +
                                   '</div>'
                               }
-                              throw new Error(
-                                `image "${name}" did not match the gold image`,
-                              )
+                              log
+                                .snapshot('diff image')
+                                .error(
+                                  new Error(
+                                    `image "${name}" did not match the gold image`,
+                                  ),
+                                )
                             })
                         })
                       })
