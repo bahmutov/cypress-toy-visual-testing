@@ -340,13 +340,11 @@ Cypress.Commands.add(
                                   approveButton +
                                   '</div>'
                               }
-                              log
-                                .snapshot('diff image')
-                                .error(
-                                  new Error(
-                                    `image "${name}" did not match the gold image`,
-                                  ),
-                                )
+                              const message = `image "${name}" did not match the gold image`
+                              const error = new Error(message)
+                              log.snapshot('diff image').error(error)
+
+                              throw error
                             })
                         })
                       })

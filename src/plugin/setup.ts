@@ -13,6 +13,8 @@ type ImageSize = {
   height: number
 }
 
+const label = 'cypress-toy-visual-testing'
+
 function imageSizeDiffer(image1: ImageSize, image2: ImageSize) {
   if (image1.width === image2.width && image1.height === image2.height) {
     return false
@@ -196,8 +198,10 @@ async function diffAnImage(options, config) {
       result.reason = 'Updated gold image'
     }
 
+    console.log('%s: images matched? %s', label, result.match)
     return {
       ...result,
+      match: Boolean(result.match),
       diffImagePath,
       elapsed,
     }
