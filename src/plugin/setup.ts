@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-const { compare } = require('odiff-bin')
+import { compare } from 'odiff-bin'
 const _ = require('lodash')
 const pluralize = require('pluralize')
 const ghCore = require('@actions/core')
@@ -151,7 +151,7 @@ async function diffAnImage(options, config) {
       }
     }
 
-    const result = await compare(
+    let result = await compare(
       goldPath,
       screenshotPath,
       diffImagePath,
@@ -159,6 +159,17 @@ async function diffAnImage(options, config) {
     )
     const finished = +Date.now()
     const elapsed = finished - started
+
+    // weird: odiff v4.1.1 returns no match with 1 pixel off by 0 percentage
+    // "fix" it and ignore such case
+    if (
+      result.match === false &&
+      result.reason === 'pixel-diff' &&
+      result.diffPercentage === 0 &&
+      result.diffCount === 1
+    ) {
+      result = { match: true }
+    }
 
     if (options.ignoreRegions && options.ignoreRegions.length) {
       console.log(
@@ -183,7 +194,7 @@ async function diffAnImage(options, config) {
 
     // if we work on a PR we want to update the Gold images
     // so that the user reviews the changes
-    if (result.match === false) {
+    if (result.match === false && result.reason === 'pixel-diff') {
       if (
         'diffPercentage' in options &&
         options.diffPercentage > 0 &&
