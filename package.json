@@ -14,7 +14,7 @@
     "test": "cypress run",
     "semantic-release": "semantic-release",
     "cy:open": "cypress open",
-    "deps": "npm audit --omit=dev"
+    "deps": "npm audit --omit=dev --audit-level=high"
   },
   "keywords": [
     "cypress",
