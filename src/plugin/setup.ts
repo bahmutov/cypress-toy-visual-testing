@@ -72,6 +72,13 @@ async function diffAnImage(options, config) {
       ignoreRegions: options.ignoreRegions,
       failOnLayoutDiff: options.failOnLayoutDiff,
     }
+    // odiff v4.1.1chokes on empty ignoreRegions arrays
+    // with "Invalid ignore regions format"
+    if (Array.isArray(odiffOptions.ignoreRegions)) {
+      if (odiffOptions.ignoreRegions.length === 0) {
+        delete odiffOptions.ignoreRegions
+      }
+    }
 
     console.log(odiffOptions)
     const started = +Date.now()
