@@ -13,7 +13,8 @@
     "watch": "tsc --watch",
     "test": "cypress run",
     "semantic-release": "semantic-release",
-    "cy:open": "cypress open"
+    "cy:open": "cypress open",
+    "deps": "npm audit --omit=dev"
   },
   "keywords": [
     "cypress",
@@ -31,13 +32,13 @@
     "fastify": "^5.6.1",
     "image-size": "^2.0.2",
     "lodash": "^4.17.21",
-    "odiff-bin": "^3.0.0",
+    "odiff-bin": "^4.1.1",
     "path-browserify": "^1.0.1",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "cypress": "^14.0.0",
+    "cypress": "^15.4.0",
     "prettier": "^3.2.5",
     "semantic-release": "^24.0.0",
     "typescript": "^5.4.5"
