@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-const { compare } = require('odiff-bin')
+import { compare } from 'odiff-bin'
 const _ = require('lodash')
 const pluralize = require('pluralize')
 const ghCore = require('@actions/core')
@@ -11,6 +11,47 @@ const { imageSizeFromFile } = require('image-size/fromFile')
 type ImageSize = {
   width: number
   height: number
+}
+
+type OdiffMatch = { match: true }
+type OdiffLayoutDiff = { match: false; reason: 'layout-diff' }
+type OdiffPixelDiff = {
+  match: false
+  reason: 'pixel-diff'
+  /** Amount of different pixels */
+  diffCount: number
+  /** Percentage of different pixels in the whole image */
+  diffPercentage: number
+  /** Individual line indexes containing different pixels. Guaranteed to be ordered and distinct.  */
+  diffLines?: number[]
+}
+type OdiffFileNotExists = {
+  match: false
+  reason: 'file-not-exists'
+  /** Errored file path */
+  file: string
+}
+
+type OdiffResult =
+  | OdiffMatch
+  | OdiffLayoutDiff
+  | OdiffPixelDiff
+  | OdiffFileNotExists
+
+type DiffImageResult = {
+  match: boolean
+  reason:
+    | 'no difference'
+    | 'layout-diff'
+    | 'pixel-diff'
+    | 'file-not-exists'
+    | 'Image dimensions differ above tolerance'
+    | 'Diff below threshold'
+    | 'Copied new image to gold'
+    | 'Updated gold image'
+  diffImagePath?: string
+  elapsed: number
+  newImage?: boolean
 }
 
 const label = 'cypress-toy-visual-testing'
@@ -30,7 +71,7 @@ function imageSizeDiffer(image1: ImageSize, image2: ImageSize) {
   }
 }
 
-async function diffAnImage(options, config) {
+async function diffAnImage(options, config): Promise<DiffImageResult> {
   if (!options) {
     throw new Error('Missing diff options')
   }
@@ -71,6 +112,13 @@ async function diffAnImage(options, config) {
       threshold: 0.1,
       ignoreRegions: options.ignoreRegions,
       failOnLayoutDiff: options.failOnLayoutDiff,
+    }
+    // odiff v4.1.1chokes on empty ignoreRegions arrays
+    // with "Invalid ignore regions format"
+    if (Array.isArray(odiffOptions.ignoreRegions)) {
+      if (odiffOptions.ignoreRegions.length === 0) {
+        delete odiffOptions.ignoreRegions
+      }
     }
 
     console.log(odiffOptions)
@@ -144,7 +192,7 @@ async function diffAnImage(options, config) {
       }
     }
 
-    const result = await compare(
+    const result: OdiffResult = await compare(
       goldPath,
       screenshotPath,
       diffImagePath,
@@ -152,6 +200,25 @@ async function diffAnImage(options, config) {
     )
     const finished = +Date.now()
     const elapsed = finished - started
+
+    const diffResult: DiffImageResult = {
+      reason: 'reason' in result ? result.reason : 'no difference',
+      match: Boolean(result.match),
+      diffImagePath,
+      elapsed,
+    }
+
+    // weird: odiff v4.1.1 returns no match with 1 pixel off by 0 percentage
+    // "fix" it and ignore such case
+    if (
+      result.match === false &&
+      result.reason === 'pixel-diff' &&
+      result.diffPercentage === 0 &&
+      result.diffCount === 1
+    ) {
+      diffResult.match = true
+      diffResult.reason = 'no difference'
+    }
 
     if (options.ignoreRegions && options.ignoreRegions.length) {
       console.log(
@@ -176,7 +243,7 @@ async function diffAnImage(options, config) {
 
     // if we work on a PR we want to update the Gold images
     // so that the user reviews the changes
-    if (result.match === false) {
+    if (result.match === false && result.reason === 'pixel-diff') {
       if (
         'diffPercentage' in options &&
         options.diffPercentage > 0 &&
@@ -186,25 +253,21 @@ async function diffAnImage(options, config) {
           'image difference below threshold %d',
           options.diffPercentage,
         )
-        result.match = true
-        result.reason = 'Diff below threshold'
+        diffResult.match = true
+        diffResult.reason = 'Diff below threshold'
       }
     }
 
     if (result.match === false && config.env.updateGoldImages) {
       console.log('Updating gold image %s', goldPath)
       fs.copyFileSync(screenshotPath, goldPath)
-      result.match = true
-      result.reason = 'Updated gold image'
+      diffResult.match = true
+      diffResult.reason = 'Updated gold image'
     }
 
-    console.log('%s: images matched? %s', label, result.match)
-    return {
-      ...result,
-      match: Boolean(result.match),
-      diffImagePath,
-      elapsed,
-    }
+    console.log('%s: images matched? %s', label, diffResult.match)
+
+    return diffResult
   }
 }
 
@@ -293,7 +356,9 @@ export function setupVisualTesting(on, config) {
             rows.push(['✅', options.name, '--'])
           } else {
             differentImages += 1
-            rows.push(['❌', options.name, result.diffPercentage.toFixed(3)])
+            const percentage =
+              'diffPercentage' in result ? (result.diffPercentage as number) : 0
+            rows.push(['❌', options.name, percentage.toFixed(3)])
           }
         }
 
@@ -373,11 +438,13 @@ export function setupVisualTesting(on, config) {
         matchingImages += 1
       } else {
         if ('diffPercentage' in options && options.diffPercentage > 0) {
-          if (result.diffPercentage < options.diffPercentage) {
+          const percentage =
+            'diffPercentage' in result ? (result.diffPercentage as number) : 0
+          if (percentage < options.diffPercentage) {
             console.log(
               '👍 Image %s diff %d is within diff percentage %d',
               options.name,
-              result.diffPercentage,
+              percentage,
               options.diffPercentage,
             )
             matchingImages += 1

@@ -41,6 +41,9 @@ jobs:
       - name: Check types 🏷️
         run: npm run lint
 
+      - name: Check dependencies 🛠️
+        run: npm run deps
+
       # set the final visual status for the current commit
       # using myrotvorets/set-commit-status-action action
       # based on the status set in the "e2e" step
