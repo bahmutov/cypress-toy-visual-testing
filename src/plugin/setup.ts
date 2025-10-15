@@ -6,7 +6,7 @@ const pluralize = require('pluralize')
 const ghCore = require('@actions/core')
 require('console.table')
 const fastify = require('fastify')
-const imageSize = require('image-size')
+const { imageSizeFromFile } = require('image-size/fromFile')
 
 type ImageSize = {
   width: number
@@ -75,8 +75,8 @@ async function diffAnImage(options, config) {
 
     console.log(odiffOptions)
     const started = +Date.now()
-    const goldImageSize = imageSize(goldPath)
-    const screenshotImageSize = imageSize(screenshotPath)
+    const goldImageSize = await imageSizeFromFile(goldPath)
+    const screenshotImageSize = await imageSizeFromFile(screenshotPath)
     const dimensionDifference = imageSizeDiffer(
       goldImageSize,
       screenshotImageSize,
