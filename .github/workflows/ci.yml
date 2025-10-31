@@ -59,7 +59,7 @@ jobs:
 
       # after the test run completes store the screenshots and diffs
       - name: Save screenshots 📸
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         # always upload the screenshots, even if the tests fail
         if: always()
         with:
